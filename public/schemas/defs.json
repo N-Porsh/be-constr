@@ -1,0 +1,535 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "definitions": {
+    "user": {
+      "type": "object",
+      "required": [
+        "role",
+        "name",
+        "email",
+        "password"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "role": {
+          "type": "string",
+          "description": "Role type",
+          "enum": [
+            "INSPECTOR",
+            "SUPER_ADMIN"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 64
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 5,
+          "maxLength": 128
+        },
+        "password": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 300
+        }
+      }
+    },
+    "auth": {
+      "type": "object",
+      "required": [
+        "email",
+        "password"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 5,
+          "maxLength": 128
+        },
+        "password": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 300
+        }
+      }
+    },
+    "responsible_person": {
+      "type": "object",
+      "required": [
+        "name",
+        "email"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 64
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "minLength": 5,
+          "maxLength": 128
+        }
+      }
+    },
+    "observation_type": {
+      "type": "object",
+      "required": [
+        "name",
+        "active",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 128
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "required": [
+        "report_id",
+        "observation_type_id",
+        "correct_count"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "report_id": {
+          "type": "integer"
+        },
+        "observation_type_id": {
+          "type": "integer"
+        },
+        "correct_count": {
+          "type": "integer"
+        }
+      }
+    },
+    "defect": {
+      "type": "object",
+      "required": [
+        "observation_id",
+        "responsible_person_id",
+        "deadline",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "observation_id": {
+          "type": "integer"
+        },
+        "responsible_person_id": {
+          "type": "integer"
+        },
+        "resolved": {
+          "type": "boolean",
+          "default": false
+        },
+        "resolved_date": {
+          "type": ["string", "null"],
+          "description": "Timestamp or null",
+          "examples": [
+            "2020-04-22 16:03:45.715815",
+            "2020-04-06 15:15:23",
+            "2020-04-06",
+            null
+          ]
+        },
+        "deadline": {
+          "type": "string",
+          "description": "Timestamp here",
+          "examples": [
+            "2020-04-22 16:03:45.715815",
+            "2020-04-06 15:15:23",
+            "2020-04-06"
+          ]
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "object": {
+      "type": "object",
+      "required": [
+        "name",
+        "location",
+        "last_inspection_date"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 128
+        },
+        "location": {
+          "type": "string",
+          "minLength": 2,
+          "maxLength": 128
+        },
+        "active": {
+          "type": "boolean",
+          "default": true
+        },
+        "last_inspection_date": {
+          "type": "string",
+          "description": "timestamp here",
+          "examples": [
+            "2020-04-22 16:03:45.715815",
+            "2020-04-06 15:15:23",
+            "2020-04-06"
+          ]
+        },
+        "created_date": {
+          "type": "string",
+          "default": "current_timestamp"
+        }
+      }
+    },
+    "report": {
+      "type": "object",
+      "required": [
+        "object_id",
+        "user_id",
+        "status",
+        "description"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "object_id": {
+          "type": "integer"
+        },
+        "user_id": {
+          "type": "integer"
+        },
+        "status": {
+          "type": "string",
+          "description": "Report status/state",
+          "enum": [
+            "DRAFT",
+            "SUBMITTED",
+            "FINISHED"
+          ]
+        },
+        "description": {
+          "type": ["string", "null"]
+        },
+        "created_date": {
+          "type": "string",
+          "default": "current_timestamp"
+        },
+        "modified_date": {
+          "type": "string",
+          "examples": [
+            "2020-04-22 16:03:45.715815",
+            "2020-04-06 15:15:23",
+            "2020-04-06"
+          ]
+        }
+      }
+    },
+    "attachment": {
+      "type": "object",
+      "required": [
+        "defect_id",
+        "path"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "defect_id": {
+          "type": "integer"
+        },
+        "path": {
+          "type": "string"
+        }
+      }
+    },
+    "ReportPost": {
+      "type": "object",
+      "required": [
+        "object_id",
+        "user_id",
+        "status",
+        "description",
+        "observations"
+      ],
+      "properties": {
+        "object_id": {
+          "$id": "#/properties/object_id",
+          "type": "integer"
+        },
+        "user_id": {
+          "$id": "#/properties/user",
+          "type": "integer"
+        },
+        "status": {
+          "$id": "#/properties/status",
+          "type": "string",
+          "description": "Report status/state",
+          "enum": [
+            "DRAFT",
+            "SUBMITTED",
+            "FINISHED"
+          ]
+        },
+        "description": {
+          "$id": "#/properties/description",
+          "type": ["string", "null"]
+        },
+        "observations": {
+          "$id": "#/properties/observations",
+          "type": "array",
+          "additionalItems": true,
+          "minItems": 1,
+          "items": {
+            "$id": "#/properties/observations/items",
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "observation_type_id",
+              "correct_count",
+              "defects"
+            ],
+            "properties": {
+              "observation_type_id": {
+                "$id": "#/properties/observations/items/properties/observation_type_id",
+                "type": "integer"
+              },
+              "correct_count": {
+                "$id": "#/properties/observations/items/properties/correct_count",
+                "type": "integer"
+              },
+              "defects": {
+                "$id": "#/properties/observations/items/properties/defects",
+                "type": ["array", "null"],
+                "additionalItems": true,
+                "minItems": 1,
+                "items": {
+                  "$id": "#/properties/observations/items/properties/defects/items",
+                  "type": "object",
+                  "additionalProperties": true,
+                  "required": [
+                    "deadline",
+                    "description",
+                    "responsible_person_id",
+                    "responsible_person_name",
+                    "responsible_person_email"
+                  ],
+                  "properties": {
+                    "deadline": {
+                      "$id": "#/properties/observations/items/properties/defects/items/properties/deadline",
+                      "type": "string"
+                    },
+                    "description": {
+                      "$id": "#/properties/observations/items/properties/defects/items/properties/description",
+                      "type": "string"
+                    },
+                    "responsible_person_id": {
+                      "$id": "#/properties/observations/items/properties/defects/items/properties/responsible_person_id",
+                      "type": ["integer", "null"]
+                    },
+                    "responsible_person_name": {
+                      "$id": "#/properties/observations/items/properties/defects/items/properties/responsible_person_name",
+                      "type": "string"
+                    },
+                    "responsible_person_email": {
+                      "$id": "#/properties/observations/items/properties/defects/items/properties/responsible_person_email",
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ReportPut": {
+      "type": "object",
+      "required": [
+        "object_id",
+        "observations"
+      ],
+      "properties": {
+        "object_id": {
+          "type": "integer"
+        },
+        "user_id": {
+          "type": "integer"
+        },
+        "status": {
+          "type": "string",
+          "description": "Report status/state",
+          "enum": [
+            "DRAFT",
+            "SUBMITTED",
+            "FINISHED"
+          ]
+        },
+        "description": {
+          "type": ["string", "null"]
+        },
+        "observations": {
+          "type": "array",
+          "additionalItems": true,
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": [
+              "id",
+              "defects"
+            ],
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "observation_type_id": {
+                "type": "integer"
+              },
+              "correct_count": {
+                "type": "integer"
+              },
+              "defects": {
+                "type": ["array", "null"],
+                "additionalItems": true,
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "required": ["id"],
+                  "properties": {
+                    "id": {
+                      "type": ["integer", "null"]
+                    },
+                    "deadline": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "responsible_person_id": {
+                      "type": ["integer", "null"]
+                    },
+                    "responsible_person_name": {
+                      "type": "string"
+                    },
+                    "responsible_person_email": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "UpdateDefect": {
+      "type": "object",
+      "required": [
+        "resolved",
+        "resolved_date"
+      ],
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "observation_id": {
+          "type": "integer"
+        },
+        "responsible_person_id": {
+          "type": "integer"
+        },
+        "resolved": {
+          "type": "boolean",
+          "default": false
+        },
+        "resolved_date": {
+          "type": ["string", "null"],
+          "description": "Timestamp or null",
+          "examples": [
+            "2020-04-22 16:03:45.715815",
+            "2020-04-06 15:15:23",
+            "2020-04-06",
+            null
+          ]
+        },
+        "deadline": {
+          "type": "string",
+          "description": "Timestamp here",
+          "examples": [
+            "2020-04-22 16:03:45.715815",
+            "2020-04-06 15:15:23",
+            "2020-04-06"
+          ]
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "token": {
+      "type": "object",
+      "required": [
+        "token"
+      ],
+      "properties": {
+        "token": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "properties": {
+    "user": {"$ref": "#/definitions/user"},
+    "auth": {"$ref": "#/definitions/auth"},
+    "responsible_person": {"$ref": "#/definitions/responsible_person"},
+    "observation_type": {"$ref": "#/definitions/observation_type"},
+    "observation": {"$ref": "#/definitions/observation"},
+    "defect": {"$ref": "#/definitions/defect"},
+    "object": {"$ref": "#/definitions/object"},
+    "report": {"$ref": "#/definitions/report"},
+    "attachment": {"$ref": "#/definitions/attachment"},
+    "ReportPost": {"$ref": "#/definitions/ReportPost"},
+    "ReportPut": {"$ref": "#/definitions/ReportPut"},
+    "UpdateDefect": {"$ref": "#/definitions/UpdateDefect"},
+    "token": {"$ref": "#/definitions/token"}
+  }
+}

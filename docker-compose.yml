@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+
+  db:
+    image: postgres:11.7
+    container_name: srs-db
+    volumes:
+      - srs-db-data:/pgdata
+    environment:
+      - POSTGRES_DB=srs
+      - POSTGRES_USER=srsuser
+      - POSTGRES_PASSWORD=srspassword
+      - PGDATA=/pgdata
+    ports:
+      - "5432:5432"
+
+  be:
+    env_file:
+      - ./dev.env
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: srs-be
+    depends_on:
+      - db
+    links:
+      - "db:database" #host_name for config
+    ports:
+      - 8080:8080
+
+volumes:
+  srs-db-data:
