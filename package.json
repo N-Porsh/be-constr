@@ -23,7 +23,7 @@
     "image-thumbnail": "^1.0.8",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "morgan": "~1.10.0",
     "node-postgres-named": "^2.4.1",
     "pg": "^8.0.0",
